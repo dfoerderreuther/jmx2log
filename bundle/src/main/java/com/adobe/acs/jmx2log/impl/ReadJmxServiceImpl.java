@@ -5,16 +5,22 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 import javax.management.AttributeNotFoundException;
+import javax.management.BadAttributeValueExpException;
+import javax.management.BadBinaryOpValueExpException;
+import javax.management.BadStringOperationException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
+import javax.management.InvalidApplicationException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.QueryExp;
 import javax.management.ReflectionException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Dominik Foerderreuther <df@adobe.com> on 26.12.17.
@@ -29,11 +35,25 @@ public class ReadJmxServiceImpl implements ReadJmxService {
         return server.queryNames(null, null);
     }
 
-    public Iterable<ObjectName> mBeans(String pattern) {
-        return server.queryNames(null, null);
+    public Iterable<ObjectName> mBeans(final String pattern) {
+        final Set<ObjectName> objectNames = server.queryNames(null, new QueryExp() {
+            @Override
+            public boolean apply(ObjectName name) throws BadStringOperationException, BadBinaryOpValueExpException, BadAttributeValueExpException, InvalidApplicationException {
+                return name.toString().matches(pattern);
+            }
+
+            @Override
+            public void setMBeanServer(MBeanServer s) {
+
+            }
+        });
+        return objectNames;
+    }
+    public Iterable<MBeanAttribute> value(ObjectName mBean) throws CouldNotReadJmxValueException {
+        return value(mBean, null);
     }
 
-    public Iterable<MBeanAttribute> value(ObjectName mBean) throws CouldNotReadJmxValueException {
+    public Iterable<MBeanAttribute> value(ObjectName mBean, String namePattern) throws CouldNotReadJmxValueException {
         try {
             final MBeanAttributeInfo[] attributes = server.getMBeanInfo(mBean).getAttributes();
             final List<MBeanAttribute> resultAttributes  = new ArrayList<>();
@@ -42,6 +62,7 @@ public class ReadJmxServiceImpl implements ReadJmxService {
                 final String name = attribute.getName();
                 final String type = attribute.getType();
                 final Object value = server.getAttribute(mBean, name);
+                if (namePattern == null || name.matches(namePattern))
 
                 resultAttributes.add(new MBeanAttribute() {
                     @Override
