@@ -1,7 +1,5 @@
 package com.adobe.acs.jmx2log.impl;
 
-import com.adobe.acs.jmx2log.CouldNotReadJmxValueException;
-import com.adobe.acs.jmx2log.MBeanAttribute;
 import com.adobe.acs.jmx2log.ReadJmxService;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
@@ -52,8 +50,9 @@ public class Jmx2logConfigServlet extends HttpServlet {
 
             for (final ObjectName mbean : readJmxService.mBeans()) {
                 os.println("  <tr><td colspan='4'>&nbsp;</td></tr>");
+                os.println("  <tr><td colspan='4'>" + mbean + "</td></tr>");
 
-                for (final MBeanAttribute attribute : readJmxService.value(mbean)) {
+                for (final ReadJmxService.MBeanAttribute attribute : readJmxService.value(mbean)) {
                     os.print("  <tr><td>&nbsp;</td><td>" + attribute.name()
                             + "</td><td>" + attribute.type() + "</td><td>");
 
@@ -71,7 +70,7 @@ public class Jmx2logConfigServlet extends HttpServlet {
             os.println("</table>");
             os.flush();
 
-        } catch (CouldNotReadJmxValueException e) {
+        } catch (ReadJmxService.CouldNotReadJmxValueException e) {
             e.printStackTrace();
         }
     }

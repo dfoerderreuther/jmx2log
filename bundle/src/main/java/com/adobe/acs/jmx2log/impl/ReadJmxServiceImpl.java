@@ -1,7 +1,5 @@
 package com.adobe.acs.jmx2log.impl;
 
-import com.adobe.acs.jmx2log.CouldNotReadJmxValueException;
-import com.adobe.acs.jmx2log.MBeanAttribute;
 import com.adobe.acs.jmx2log.ReadJmxService;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
