@@ -1,17 +1,16 @@
 package com.adobe.acs.jmx2log.impl;
 
+import com.adobe.acs.jmx2log.CouldNotReadJmxValueException;
+import com.adobe.acs.jmx2log.MBeanAttribute;
+import com.adobe.acs.jmx2log.ReadJmxService;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -19,10 +18,6 @@ import javax.servlet.http.HttpServlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Dominik Foerderreuther <df@adobe.com> on 25.12.17.
@@ -35,63 +30,48 @@ import java.util.Set;
 })
 public class Jmx2logConfigServlet extends HttpServlet {
 
+    @Reference
+    ReadJmxService readJmxService;
+
+    public Jmx2logConfigServlet() {
+
+    }
+
     @Override
     public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-        res.getWriter().println("test");
-
         try {
 
             final PrintWriter os = new PrintWriter(res.getWriter());
             os.println("<table>");
 
-            final List<MBeanServer> servers = new LinkedList<MBeanServer>();
-            servers.add(ManagementFactory.getPlatformMBeanServer());
-            servers.addAll(MBeanServerFactory.findMBeanServer(null));
-            for (final MBeanServer server : servers) {
+            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+
+            os.println("  <tr><td colspan='4'><hr /></td></tr>");
+            os.println("  <tr><td>Server:</td><td colspan='3'>"
+                    + server.getClass().getName() + "</td></tr>");
+
+            for (final ObjectName mbean : readJmxService.mBeans()) {
                 os.println("  <tr><td colspan='4'>&nbsp;</td></tr>");
-                os.println("  <tr><td>Server:</td><td colspan='3'>"
-                        + server.getClass().getName() + "</td></tr>");
 
-                final Set<ObjectName> mbeans = new HashSet<ObjectName>();
-                mbeans.addAll(server.queryNames(null, null));
-                for (final ObjectName mbean : mbeans) {
-                    os.println("  <tr><td colspan='4'>&nbsp;</td></tr>");
-                    os.println("  <tr><td>MBean:</td><td colspan='3'>" + mbean
-                            + "</td></tr>");
+                for (final MBeanAttribute attribute : readJmxService.value(mbean)) {
+                    os.print("  <tr><td>&nbsp;</td><td>" + attribute.name()
+                            + "</td><td>" + attribute.type() + "</td><td>");
 
-                    final MBeanAttributeInfo[] attributes;
-                    attributes = server.getMBeanInfo(mbean).getAttributes();
-
-                    for (final MBeanAttributeInfo attribute : attributes) {
-                        os.print("  <tr><td>&nbsp;</td><td>" + attribute.getName()
-                                + "</td><td>" + attribute.getType() + "</td><td>");
-
-                        try {
-                            final Object value = server.getAttribute(mbean,
-                                    attribute.getName());
-                            if (value == null) {
-                                os.print("<font color='#660000'>null</font>");
-                            } else {
-                                os.print(value.toString());
-                            }
-                        } catch (Exception e) {
-                            os.print("<font color='#990000'>" + e.getMessage()
-                                    + "</font>");
-                        }
-
-                        os.println("</td></tr>");
+                    final Object o = attribute.value();
+                    if (o == null) {
+                        os.print("<font color='#660000'>null</font>");
+                    } else {
+                        os.print(o.toString());
                     }
+
+                    os.println("</td></tr>");
                 }
             }
 
             os.println("</table>");
             os.flush();
 
-        } catch (InstanceNotFoundException e) {
-            e.printStackTrace();
-        } catch (IntrospectionException e) {
-            e.printStackTrace();
-        } catch (ReflectionException e) {
+        } catch (CouldNotReadJmxValueException e) {
             e.printStackTrace();
         }
     }
