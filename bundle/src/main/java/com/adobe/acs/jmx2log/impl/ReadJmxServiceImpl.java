@@ -1,8 +1,7 @@
 package com.adobe.acs.jmx2log.impl;
 
 import com.adobe.acs.jmx2log.ReadJmxService;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.BadAttributeValueExpException;
@@ -25,8 +24,7 @@ import java.util.Set;
 /**
  * Created by Dominik Foerderreuther <df@adobe.com> on 26.12.17.
  */
-@Component
-@Service(value = ReadJmxService.class)
+@Component(service = ReadJmxService.class)
 public class ReadJmxServiceImpl implements ReadJmxService {
 
     MBeanServer server = ManagementFactory.getPlatformMBeanServer();

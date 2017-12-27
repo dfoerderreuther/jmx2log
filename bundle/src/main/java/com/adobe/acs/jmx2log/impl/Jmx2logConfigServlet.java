@@ -1,13 +1,11 @@
 package com.adobe.acs.jmx2log.impl;
 
 import com.adobe.acs.jmx2log.ReadJmxService;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Properties;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.management.ObjectName;
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -18,20 +16,11 @@ import java.io.PrintWriter;
 /**
  * Created by Dominik Foerderreuther <df@adobe.com> on 25.12.17.
  */
-@Component
-@Service
-@Properties({
-        @Property(name = "felix.webconsole.label", value = "JMX2Log"),
-        @Property(name = "felix.webconsole.title", value = "JMX to Log")
-})
+@Component(service = Servlet.class, property = {"felix.webconsole.label=JMX2Log", "felix.webconsole.title=JMX to Log"})
 public class Jmx2logConfigServlet extends HttpServlet {
 
     @Reference
     ReadJmxService readJmxService;
-
-    public Jmx2logConfigServlet() {
-
-    }
 
     @Override
     public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
@@ -45,8 +34,8 @@ public class Jmx2logConfigServlet extends HttpServlet {
             os.println("<table>");
 
             // org.apache.jackrabbit.oak:name="/etc/replication//\*[11111b, no local]@com.day.cq.replication.impl.ConfigManagerImpl",type=BackgroundObserverStats,listenerId=9
-            final String attributeNamePattern = "QueueNumEntries";
             String search = ".*replication.*type=agent.*id=\"publish\".*";
+            final String attributeNamePattern = "QueueNumEntries";
             os.println("  <tr><td>search: </td><td colspan='3'>" + search + "</td></tr>");
             os.println("  <tr><td>attributeNamePattern: </td><td colspan='3'>" + attributeNamePattern + "</td></tr>");
 
