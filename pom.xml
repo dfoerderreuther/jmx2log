@@ -248,6 +248,7 @@
     <profiles>
         <profile>
             <id>autoInstallBundle</id>
+            <activation><activeByDefault>true</activeByDefault></activation>
             <build>
                 <plugins>
                     <plugin>
@@ -268,6 +269,5 @@
     </profiles>
   <modules>
     <module>bundle</module>
-    <module>content</module>
   </modules>
 </project>

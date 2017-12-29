@@ -122,7 +122,7 @@
                 <artifactId>maven-sling-plugin</artifactId>
                 <configuration>
                     <slingUrl>http://${crx.host}:${crx.port}/apps/jmx2log/install</slingUrl>
-                    <usePut>true</usePut>
+                    <deploymentMethod>WebDAV</deploymentMethod>
                 </configuration>
             </plugin>
             <plugin>
