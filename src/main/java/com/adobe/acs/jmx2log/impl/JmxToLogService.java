@@ -31,11 +31,11 @@ public class JmxToLogService implements Runnable {
 
     private final Logger log = LoggerFactory.getLogger("jmx2log");
 
-    private static final String DEFAULT_SEARCH_CONFIG = ".*replication.*type=agent.*id=\"publish\".*|QueueNumEntries";
+    static final String DEFAULT_SEARCH_CONFIG = ".*replication.*type=agent.*id=\"publish\".*|QueueNumEntries";
     @Property(unbounded = PropertyUnbounded.ARRAY, cardinality=10, label="Search", description="Regex Pattern for jmx-bean and attribute in format beanpattern|attributpattern", value=DEFAULT_SEARCH_CONFIG)
-    private static final String SEARCH_CONFIG = "jmxtolog.search.configs";
+    static final String SEARCH_CONFIG = "jmxtolog.search.configs";
 
-    private List<SearchConfig> searchConfigs;
+    List<SearchConfig> searchConfigs;
 
     @Reference
     ReadJmxService readJmxService;
