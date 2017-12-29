@@ -1,5 +1,6 @@
-package com.adobe.acs.jmx2log;
+package com.adobe.acs.jmx2log.impl;
 
+import com.adobe.acs.jmx2log.ReadJmxService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
@@ -21,7 +22,7 @@ import java.util.List;
  * Created by Dominik Foerderreuther <df@adobe.com> on 25.12.17.
  */
 @Service(Runnable.class)
-@Component(metatype=true,label="JMX to Log", description="Write JMX values continuously to logfile", configurationFactory = true)
+@Component(metatype=true, label="JMX to Log", description="Write JMX values continuously to logfile", configurationFactory = true)
 @Properties({
     @Property(name = "scheduler.concurrent", boolValue = false),
     @Property(name = "scheduler.expression", value = "0 * * * * ?")
@@ -47,7 +48,7 @@ public class JmxToLogService implements Runnable {
             if (StringUtils.isEmpty(strSearchConfig)) {
                 continue;
             }
-            String[] parts = strSearchConfig.split("|");
+            String[] parts = strSearchConfig.split("\\|");
             String namePattern = parts[0];
             String attributePattern = parts.length > 0 ? parts[1] : "";
             searchConfigs.add(new SearchConfig(namePattern, attributePattern));

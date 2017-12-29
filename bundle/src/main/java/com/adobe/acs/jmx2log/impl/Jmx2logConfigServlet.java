@@ -24,8 +24,8 @@ public class Jmx2logConfigServlet extends HttpServlet {
 
     @Override
     public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-        search(res.getWriter());
-        //complete(res.getWriter());
+        //search(res.getWriter());
+        complete(res.getWriter());
     }
 
     private void search(PrintWriter writer) {
