@@ -27,7 +27,7 @@ import java.util.Set;
 @Component(service = ReadJmxService.class)
 public class ReadJmxServiceImpl implements ReadJmxService {
 
-    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+    private MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
     public Iterable<ObjectName> mBeans() {
         return server.queryNames(null, null);

@@ -29,7 +29,7 @@ import java.util.List;
 })
 public class JmxToLogService implements Runnable {
 
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger("jmx2log");
 
     private static final String DEFAULT_SEARCH_CONFIG = ".*replication.*type=agent.*id=\"publish\".*|QueueNumEntries";
     @Property(unbounded = PropertyUnbounded.ARRAY, cardinality=10, label="Search", description="Regex Pattern for jmx-bean and attribute in format beanpattern|attributpattern", value=DEFAULT_SEARCH_CONFIG)
@@ -56,7 +56,6 @@ public class JmxToLogService implements Runnable {
     }
 
     public void run() {
-        log.trace("run");
         for (SearchConfig searchConfig : searchConfigs) {
             logJmxValues(searchConfig.getNamePattern(), searchConfig.getAttributePattern());
         }
@@ -66,7 +65,7 @@ public class JmxToLogService implements Runnable {
         for (ObjectName mBean : readJmxService.mBeans(namePattern)) {
             try {
                 for (ReadJmxService.MBeanAttribute mBeanAttribute : readJmxService.value(mBean, attributeNamePattern)) {
-                    log.trace(mBeanAttribute.name() + ": " + mBeanAttribute.value());
+                    log.info(mBeanAttribute.name() + ": " + mBeanAttribute.value());
                 }
             } catch (ReadJmxService.CouldNotReadJmxValueException e) {
                 log.error(String.format("cant read mBean values for %s", mBean.toString()), e);
