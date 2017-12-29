@@ -49,7 +49,7 @@ public class JmxToLogService implements Runnable {
         searchConfigs = new ArrayList<>();
         String[] strSearchConfigs = PropertiesUtil.toStringArray(ctx.getProperties().get(SEARCH_CONFIG), new String[]{DEFAULT_SEARCH_CONFIG});
         for (String strSearchConfig : strSearchConfigs) {
-            if (StringUtils.isEmpty(strSearchConfig)) {
+            if (StringUtils.isBlank(strSearchConfig)) {
                 continue;
             }
             String[] parts = strSearchConfig.split("\\|");

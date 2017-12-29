@@ -51,6 +51,22 @@ public class JmxToLogServiceTest {
     }
 
     @Test
+    public void activate_ignoreEmptyConfigs() throws Exception {
+        // given
+        when(ctx.getProperties().get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{
+                "",
+                " ",
+                null
+        });
+
+        // when
+        underTest.activate(ctx);
+
+        // then
+        assertThat(underTest.searchConfigs.size(), is(0));
+    }
+
+    @Test
     public void activate_resetSearchConfigs() throws Exception {
         // given
         when(ctx.getProperties().get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"a|b"});
