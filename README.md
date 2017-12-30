@@ -13,9 +13,15 @@ This project uses Maven for building. Common commands:
 Configuration
 --------
 
+Logging
+--------
+
 Go to /system/console/slinglog and create an info logger for jmx2log.
 
 ![Log Config](/doc/logconfig.png)
+
+Service-Configuration
+--------
 
 Go to /system/console/configMgr and create a new service instance with a configuration. Possible configuration settings are:
 
