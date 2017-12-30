@@ -3,12 +3,14 @@ jmx2log
 
 OSGi bundle with a service writing defined JMX values continuously to a logfile. Tested with AEM / Apache Felix
 
+
 Building
 --------
 
 This project uses Maven for building. Common commands:
 
     mvn clean install
+
 
 Configuration
 --------
@@ -19,6 +21,7 @@ Logging
 Go to /system/console/slinglog and create an info logger for jmx2log.
 
 ![Log Config](/doc/logconfig.png)
+
 
 Service-Configuration
 --------
@@ -42,6 +45,13 @@ The service is searching with BEAN for a JMX bean with a matching canonical name
 If a matching bean was found, the service is searching for an attribute with a matching name. The serach pattern ATTRIBUTE is used as a regular expression, again.
 
 ![Service Config](/doc/config.png)
+
+
+Example Log output
+---------
+
+![Log Config](/doc/output.png)
+
 
 JMX-Dump-View
 --------
