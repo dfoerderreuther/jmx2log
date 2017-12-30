@@ -15,7 +15,7 @@ Configuration
 
 Go to /system/console/slinglog and create an info logger for jmx2log.
 
-![Log Config](/doc/log-config.png)
+![Log Config](/doc/logconfig.png)
 
 Go to /system/console/configMgr and create a new service instance with a configuration. Possible configuration settings are:
 
