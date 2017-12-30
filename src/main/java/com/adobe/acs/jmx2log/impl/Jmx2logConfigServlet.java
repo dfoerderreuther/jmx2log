@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.ObjectName;
-import javax.management.RuntimeMBeanException;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -48,7 +47,7 @@ public class Jmx2logConfigServlet extends HttpServlet {
             os.println("<tbody class=\"ui-widget-content\">\n");
 
             try {
-                for (final ReadJmxService.MBeanAttribute attribute : readJmxService.value(mbean)) {
+                for (final ReadJmxService.MBeanAttribute attribute : readJmxService.attributes(mbean)) {
 
                     os.println("<tr>\n" +
                             "<td style=\"width:20%\">" + attribute.name() + "</td>\n" +
@@ -58,7 +57,7 @@ public class Jmx2logConfigServlet extends HttpServlet {
 
                 }
 
-            } catch (RuntimeMBeanException | ReadJmxService.CouldNotReadJmxValueException e) {
+            } catch (ReadJmxService.CouldNotReadJmxValueException e) {
                 log.error("cant read attributes of " + mbean.toString(), e);
             }
 

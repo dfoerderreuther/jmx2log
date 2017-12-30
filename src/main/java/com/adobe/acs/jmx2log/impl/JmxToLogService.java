@@ -68,7 +68,7 @@ public class JmxToLogService implements Runnable {
     private void logJmxValues(String namePattern, String attributeNamePattern) {
         for (ObjectName mBean : readJmxService.mBeans(namePattern)) {
             try {
-                for (ReadJmxService.MBeanAttribute mBeanAttribute : readJmxService.value(mBean, attributeNamePattern)) {
+                for (ReadJmxService.MBeanAttribute mBeanAttribute : readJmxService.attributes(mBean, attributeNamePattern)) {
                     log(mBeanAttribute);
                 }
             } catch (ReadJmxService.CouldNotReadJmxValueException e) {

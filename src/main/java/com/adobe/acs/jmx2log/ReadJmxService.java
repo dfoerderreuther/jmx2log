@@ -11,9 +11,9 @@ public interface ReadJmxService {
 
     Iterable<ObjectName> mBeans(String pattern);
 
-    Iterable<MBeanAttribute> value(ObjectName mBean) throws CouldNotReadJmxValueException;
+    Iterable<MBeanAttribute> attributes(ObjectName mBean) throws CouldNotReadJmxValueException;
 
-    Iterable<MBeanAttribute> value(ObjectName mBean, String namePattern) throws CouldNotReadJmxValueException;
+    Iterable<MBeanAttribute> attributes(ObjectName mBean, String namePattern) throws CouldNotReadJmxValueException;
 
     interface MBeanAttribute {
         String name();

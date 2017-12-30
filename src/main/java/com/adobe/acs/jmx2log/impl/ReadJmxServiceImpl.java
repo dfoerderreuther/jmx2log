@@ -1,6 +1,7 @@
 package com.adobe.acs.jmx2log.impl;
 
 import com.adobe.acs.jmx2log.ReadJmxService;
+import com.google.common.annotations.VisibleForTesting;
 import org.osgi.service.component.annotations.Component;
 
 import javax.management.AttributeNotFoundException;
@@ -16,6 +17,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.QueryExp;
 import javax.management.ReflectionException;
+import javax.management.RuntimeMBeanException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,8 @@ import java.util.Set;
 @Component(service = ReadJmxService.class)
 public class ReadJmxServiceImpl implements ReadJmxService {
 
-    private MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+    @VisibleForTesting
+    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
     public Iterable<ObjectName> mBeans() {
         return server.queryNames(null, null);
@@ -47,11 +50,11 @@ public class ReadJmxServiceImpl implements ReadJmxService {
         });
         return objectNames;
     }
-    public Iterable<MBeanAttribute> value(ObjectName mBean) throws CouldNotReadJmxValueException {
-        return value(mBean, null);
+    public Iterable<MBeanAttribute> attributes(ObjectName mBean) throws CouldNotReadJmxValueException {
+        return attributes(mBean, null);
     }
 
-    public Iterable<MBeanAttribute> value(ObjectName mBean, String namePattern) throws CouldNotReadJmxValueException {
+    public Iterable<MBeanAttribute> attributes(ObjectName mBean, String namePattern) throws CouldNotReadJmxValueException {
         try {
             final MBeanAttributeInfo[] attributes = server.getMBeanInfo(mBean).getAttributes();
             final List<MBeanAttribute> resultAttributes  = new ArrayList<>();
@@ -81,7 +84,7 @@ public class ReadJmxServiceImpl implements ReadJmxService {
 
             }
             return resultAttributes;
-        } catch (InstanceNotFoundException | IntrospectionException | ReflectionException | MBeanException | AttributeNotFoundException e) {
+        } catch (RuntimeMBeanException | InstanceNotFoundException | IntrospectionException | ReflectionException | MBeanException | AttributeNotFoundException e) {
             throw new CouldNotReadJmxValueException(e);
         }
     }

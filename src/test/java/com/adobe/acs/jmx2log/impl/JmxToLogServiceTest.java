@@ -92,17 +92,17 @@ public class JmxToLogServiceTest {
         when(readJmxService.mBeans(Mockito.anyString())).thenReturn(Lists.newArrayList(mBean));
 
         ReadJmxService.MBeanAttribute attribute = mockMBean("name", String.class.getName(), "value");
-        when(readJmxService.value(Mockito.any(ObjectName.class), Mockito.anyString())).thenReturn(Lists.newArrayList(attribute));
+        when(readJmxService.attributes(Mockito.any(ObjectName.class), Mockito.anyString())).thenReturn(Lists.newArrayList(attribute));
 
         // when
         underTest.run();
 
         // then
         verify(readJmxService).mBeans("beanA");
-        verify(readJmxService).value(mBean, "attributeA");
+        verify(readJmxService).attributes(mBean, "attributeA");
 
         verify(readJmxService).mBeans("beanB");
-        verify(readJmxService).value(mBean, "attributeB");
+        verify(readJmxService).attributes(mBean, "attributeB");
     }
     @Test
     public void run_shouldLogResult() throws Exception {
@@ -114,7 +114,7 @@ public class JmxToLogServiceTest {
         when(readJmxService.mBeans(Mockito.anyString())).thenReturn(Lists.newArrayList(mBean));
 
         ReadJmxService.MBeanAttribute attribute = mockMBean("name", String.class.getName(), "value");
-        when(readJmxService.value(Mockito.any(ObjectName.class), Mockito.anyString())).thenReturn(Lists.newArrayList(attribute));
+        when(readJmxService.attributes(Mockito.any(ObjectName.class), Mockito.anyString())).thenReturn(Lists.newArrayList(attribute));
 
         // when
         underTest.run();
