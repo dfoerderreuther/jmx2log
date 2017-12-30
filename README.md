@@ -40,9 +40,9 @@ Time settings...
 
 1..n Strings with JMX search pattern in format BEAN|ATTRIBUTE
 
-The service is searching with BEAN for a JMX bean with a matching canonical name. BEAN is used a regular expression.
+The service is searching with BEAN for a JMX bean with a matching canonical name. The search pattern BEAN is used as a regular expression.
 
-If a matching bean was found, the service is searching for an attribute with a matching name. The serach pattern ATTRIBUTE is used as a regular expression, again.
+If a matching bean was found, the service is searching for an attribute with a matching name. The search pattern ATTRIBUTE is used as a regular expression, again.
 
 ![Service Config](/doc/config.png)
 
