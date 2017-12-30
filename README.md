@@ -1,7 +1,7 @@
 jmx2log
 ========
 
-This bundle which contains a service for writing jmx values from current vm to a logfile.
+OSGi bundle with a service writing defined JMX values continuously to a logfile. Tested with AEM / Apache Felix
 
 Building
 --------
