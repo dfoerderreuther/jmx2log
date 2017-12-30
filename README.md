@@ -31,6 +31,21 @@ The service is searching with BEAN for a JMX bean with a matching canonical name
 
 If a matching bean was found, the service is searching for an attribute with a matching name. The serach pattern ATTRIBUTE is used as a regular expression, again.
 
-**Example**
+JMX-Dump-View
+--------
 
-![Example](/doc/config.png)
+There is a Servlet for an overview of accessible JMX-Beans and attributes.
+
+/system/console/JMX-Dump
+
+Example
+--------
+
+**Service Config /system/console/configMgr**
+
+![Service Config](/doc/config.png)
+
+**Log Config /system/console/slinglog**
+
+![Log Config](/doc/log-config.png)
+
