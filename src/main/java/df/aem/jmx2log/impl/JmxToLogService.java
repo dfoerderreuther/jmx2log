@@ -1,6 +1,6 @@
-package com.adobe.acs.jmx2log.impl;
+package df.aem.jmx2log.impl;
 
-import com.adobe.acs.jmx2log.ReadJmxService;
+import df.aem.jmx2log.ReadJmxService;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Activate;

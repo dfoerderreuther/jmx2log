@@ -1,6 +1,6 @@
-package com.adobe.acs.jmx2log.impl;
+package df.aem.jmx2log.impl;
 
-import com.adobe.acs.jmx2log.ReadJmxService;
+import df.aem.jmx2log.ReadJmxService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package com.adobe.acs.jmx2log;
+package df.aem.jmx2log;
 
 import static org.junit.Assert.*;
 

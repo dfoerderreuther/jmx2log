@@ -1,6 +1,6 @@
-package com.adobe.acs.jmx2log.impl;
+package df.aem.jmx2log.impl;
 
-import com.adobe.acs.jmx2log.ReadJmxService;
+import df.aem.jmx2log.ReadJmxService;
 import com.google.common.collect.Iterables;
 import org.junit.Test;
 import org.junit.runner.RunWith;
