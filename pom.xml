@@ -6,7 +6,7 @@
     <!-- ====================================================================== -->
 
     <groupId>df.aem.jmx2log</groupId>
-    <version>1.4</version>
+    <version>1.5-SNAPSHOT</version>
 
     <artifactId>jmx2log</artifactId>
     <packaging>bundle</packaging>
@@ -37,7 +37,7 @@
         <url>https://github.com/dfoerderreuther/jmx2log</url>
         <connection>scm:git:git@github.com:dfoerderreuther/jmx2log.git</connection>
         <developerConnection>scm:git:git@github.com:dfoerderreuther/jmx2log.git</developerConnection>
-        <tag>1.4</tag>
+        <tag>@{project.version}</tag>
     </scm>
 
 
