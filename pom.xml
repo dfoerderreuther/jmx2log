@@ -31,8 +31,8 @@
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <release.version>1.5.0</release.version>
-        <release.tag>v1.5.0</release.tag>
+        <release.version>1.5.1</release.version>
+        <release.tag>v${release.version}</release.tag>
     </properties>
 
     <scm>
@@ -188,9 +188,17 @@
                 <artifactId>github-release-plugin</artifactId>
                 <version>1.2.0</version>
                 <configuration>
-                    <description>See http://www.jabylon.org for details</description>
+                    <description></description>
                     <releaseName>${release.version}</releaseName>
                     <tag>${release.tag}</tag>
+                    <fileSets>
+                        <fileSet>
+                            <directory>${project.build.directory}</directory>
+                            <includes>
+                                <include>${project.artifactId}*.jar</include>
+                            </includes>
+                        </fileSet>
+                    </fileSets>
                 </configuration>
             </plugin>
         </plugins>
