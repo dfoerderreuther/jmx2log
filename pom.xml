@@ -201,6 +201,11 @@
                         </fileSet>
                     </fileSets>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <pluginManagement>
