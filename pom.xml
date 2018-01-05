@@ -6,7 +6,7 @@
     <!-- ====================================================================== -->
 
     <groupId>df.aem.jmx2log</groupId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.5-SNAPSHOT</version>
 
     <artifactId>jmx2log</artifactId>
     <packaging>bundle</packaging>
