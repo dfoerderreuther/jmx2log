@@ -42,7 +42,6 @@
         <tag>@{project.version}</tag>
     </scm>
 
-
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -180,6 +179,8 @@
                     <tag>${release.tag}</tag>
                     <releaseVersion>${release.version}</releaseVersion>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <goals>pre-integration-test</goals>
+                    <preparationGoals>package</preparationGoals>
                 </configuration>
             </plugin>
             <plugin>
