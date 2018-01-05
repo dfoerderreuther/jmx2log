@@ -3,6 +3,10 @@ jmx2log
 
 OSGi bundle with a service writing defined JMX values continuously to a logfile. Tested with AEM / Apache Felix
 
+Release downloads
+--------
+
+[Releases](https://github.com/dfoerderreuther/jmx2log/releases)
 
 Building
 --------
@@ -10,7 +14,6 @@ Building
 This project uses Maven for building. Common commands:
 
     mvn clean install
-
 
 Configuration
 --------
