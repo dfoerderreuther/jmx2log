@@ -1,36 +1,45 @@
 package df.aem.jmx2log.impl;
 
-import df.aem.jmx2log.ReadJmxService;
 import com.google.common.annotations.VisibleForTesting;
+import df.aem.jmx2log.ReadJmxService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Properties;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.PropertyUnbounded;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
+import org.apache.felix.scr.annotations.*;
 import org.apache.sling.commons.osgi.PropertiesUtil;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.ObjectName;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Dominik Foerderreuther <df@adobe.com> on 25.12.17.
  */
 @Service(Runnable.class)
-@Component(metatype=true, label="JMX to Log", description="Write JMX values continuously to logfile", configurationFactory = true)
+@Component(metatype=true,
+        label="JMX to Log", description="Write JMX values continuously to logfile",
+        configurationFactory = true, policy = ConfigurationPolicy.REQUIRE)
 @Properties({
     @Property(name = "scheduler.concurrent", boolValue = false),
     @Property(name = "scheduler.expression", value = "0 * * * * ?")
 })
 public class JmxToLogService implements Runnable {
 
-    private final Logger log = LoggerFactory.getLogger("jmx2log");
+    private static final String LOGGER_NAME_PROP = "logger.name";
+    private static final String LOGGER_NAME_DEFAULT = "jmx2log";
+
+    private static final String MESSAGE_TEMPLATE_PROP = "messageTemplate";
+    private static final String MESSAGE_TEMPLATE_DEFAULT = "{1}: {2}";
+
+    @Property(label = "Logger", name=LOGGER_NAME_PROP, value=LOGGER_NAME_DEFAULT,
+              description = "Name of the logger to log to.")
+    private Logger log = null;
+
+    @Property(label = "Message Template", name=MESSAGE_TEMPLATE_PROP, value = MESSAGE_TEMPLATE_DEFAULT,
+              description = "{0}: Type {1}: Name of property, {2}: Value of property, {3}: Bean pattern, {4}: Property pattern")
+    private String messageTemplate = MESSAGE_TEMPLATE_DEFAULT;
 
     @VisibleForTesting
     static final String DEFAULT_SEARCH_CONFIG = ".*replication.*type=agent.*id=\"publish\".*|QueueNumEntries";
@@ -45,9 +54,9 @@ public class JmxToLogService implements Runnable {
     ReadJmxService readJmxService;
 
     @Activate
-    protected void activate(ComponentContext ctx) {
+    protected void activate(final Map<String, Object> props) {
         searchConfigs = new ArrayList<>();
-        String[] strSearchConfigs = PropertiesUtil.toStringArray(ctx.getProperties().get(SEARCH_CONFIG), new String[]{DEFAULT_SEARCH_CONFIG});
+        String[] strSearchConfigs = PropertiesUtil.toStringArray(props.get(SEARCH_CONFIG), new String[]{DEFAULT_SEARCH_CONFIG});
         for (String strSearchConfig : strSearchConfigs) {
             if (StringUtils.isBlank(strSearchConfig)) {
                 continue;
@@ -57,6 +66,14 @@ public class JmxToLogService implements Runnable {
             String attributePattern = parts.length > 0 ? parts[1] : "";
             searchConfigs.add(new SearchConfig(namePattern, attributePattern));
         }
+
+        messageTemplate = PropertiesUtil.toString(props.get(MESSAGE_TEMPLATE_PROP), MESSAGE_TEMPLATE_DEFAULT);
+        log = LoggerFactory.getLogger(PropertiesUtil.toString(props.get(LOGGER_NAME_PROP), LOGGER_NAME_DEFAULT));
+    }
+
+    @Deactivate
+    private void deactivate() {
+        this.log = null;
     }
 
     public void run() {
@@ -69,7 +86,7 @@ public class JmxToLogService implements Runnable {
         for (ObjectName mBean : readJmxService.mBeans(namePattern)) {
             try {
                 for (ReadJmxService.MBeanAttribute mBeanAttribute : readJmxService.attributes(mBean, attributeNamePattern)) {
-                    log(mBeanAttribute);
+                    log(mBeanAttribute, namePattern, attributeNamePattern);
                 }
             } catch (ReadJmxService.CouldNotReadJmxValueException e) {
                 log.error(String.format("cant read mBean values for %s", mBean.toString()), e);
@@ -78,8 +95,14 @@ public class JmxToLogService implements Runnable {
     }
 
     @VisibleForTesting
-    void log(ReadJmxService.MBeanAttribute mBeanAttribute) {
-        log.info(mBeanAttribute.name() + ": " + mBeanAttribute.value());
+    void log(final ReadJmxService.MBeanAttribute mBeanAttribute,
+             final String beanPattern, final String attributePattern) {
+        if(log!=null) {
+            final String message = MessageFormat.format(messageTemplate,
+                    mBeanAttribute.type(), mBeanAttribute.name(), mBeanAttribute.value(),
+                    beanPattern, attributePattern);
+            log.info(message);
+        }
     }
 
     @VisibleForTesting
@@ -89,9 +112,9 @@ public class JmxToLogService implements Runnable {
 
         private final String attributePattern;
 
-        SearchConfig(String canonicalNamePattern, String attributeNamePattern) {
+        SearchConfig(String canonicalNamePattern, String attributePattern) {
             this.namePattern = canonicalNamePattern;
-            this.attributePattern = attributeNamePattern;
+            this.attributePattern = attributePattern;
         }
 
         String getNamePattern() {

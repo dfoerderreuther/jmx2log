@@ -12,5 +12,9 @@ public @interface JmxToLogConfig {
 
     String schedulerExpression() default "0 * * * * ?";
 
+    String loggerName() default "jmx2log";
+
+    String messageTemplate() default "";
+
 
 }
