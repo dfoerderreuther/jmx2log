@@ -9,9 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.osgi.service.component.ComponentContext;
 
 import javax.management.ObjectName;
+
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -29,7 +30,7 @@ public class JmxToLogServiceTest {
     ReadJmxService readJmxService;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    ComponentContext ctx;
+    Map<String, Object> props;
 
     @InjectMocks
     TestableJmxToLogService underTest = new TestableJmxToLogService();
@@ -37,10 +38,10 @@ public class JmxToLogServiceTest {
     @Test
     public void activate_initSearchConfigs() throws Exception {
         // given
-        when(ctx.getProperties().get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"a|b", "c|d"});
+        when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"a|b", "c|d"});
 
         // when
-        underTest.activate(ctx);
+        underTest.activate(props);
 
         // then
         assertThat(underTest.searchConfigs.size(), is(2));
@@ -53,14 +54,14 @@ public class JmxToLogServiceTest {
     @Test
     public void activate_ignoreEmptyConfigs() throws Exception {
         // given
-        when(ctx.getProperties().get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{
+        when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{
                 "",
                 " ",
                 null
         });
 
         // when
-        underTest.activate(ctx);
+        underTest.activate(props);
 
         // then
         assertThat(underTest.searchConfigs.size(), is(0));
@@ -69,12 +70,12 @@ public class JmxToLogServiceTest {
     @Test
     public void activate_resetSearchConfigs() throws Exception {
         // given
-        when(ctx.getProperties().get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"a|b"});
-        underTest.activate(ctx);
+        when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"a|b"});
+        underTest.activate(props);
 
         // when
-        when(ctx.getProperties().get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"c|d"});
-        underTest.activate(ctx);
+        when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"c|d"});
+        underTest.activate(props);
 
         // then
         assertThat(underTest.searchConfigs.size(), is(1));
@@ -85,8 +86,8 @@ public class JmxToLogServiceTest {
     @Test
     public void run_shouldSearchForBeansAndAttributes() throws Exception {
         // given
-        when(ctx.getProperties().get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"beanA|attributeA", "beanB|attributeB"});
-        underTest.activate(ctx);
+        when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"beanA|attributeA", "beanB|attributeB"});
+        underTest.activate(props);
 
         ObjectName mBean = mock(ObjectName.class);
         when(readJmxService.mBeans(Mockito.anyString())).thenReturn(Lists.newArrayList(mBean));
@@ -107,8 +108,8 @@ public class JmxToLogServiceTest {
     @Test
     public void run_shouldLogResult() throws Exception {
         // given
-        when(ctx.getProperties().get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"beanA|attributeA"});
-        underTest.activate(ctx);
+        when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"beanA|attributeA"});
+        underTest.activate(props);
 
         ObjectName mBean = mock(ObjectName.class);
         when(readJmxService.mBeans(Mockito.anyString())).thenReturn(Lists.newArrayList(mBean));
@@ -134,11 +135,16 @@ public class JmxToLogServiceTest {
 
     class TestableJmxToLogService extends JmxToLogService {
 
-        ReadJmxService.MBeanAttribute lastLogParam;
+        ReadJmxService.MBeanAttribute lastLogParam = null;
+        String beanPattern = null;
+        String attributePattern = null;
 
         @Override
-        void log(ReadJmxService.MBeanAttribute mBeanAttribute) {
+        void log(ReadJmxService.MBeanAttribute mBeanAttribute,
+                 String beanPattern, String attributePattern) {
             this.lastLogParam = mBeanAttribute;
+            this.beanPattern = beanPattern;
+            this.attributePattern = attributePattern;
         }
     }
 
