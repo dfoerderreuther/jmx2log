@@ -63,7 +63,7 @@ public class JmxToLogService implements Runnable {
             }
             String[] parts = strSearchConfig.split("\\|");
             String namePattern = parts[0];
-            String attributePattern = parts.length > 1 ? parts[1] : "";
+            String attributePattern = parts.length > 1 ? parts[1] : ".*";
             searchConfigs.add(new SearchConfig(namePattern, attributePattern));
         }
 
