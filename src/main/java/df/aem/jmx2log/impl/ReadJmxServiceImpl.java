@@ -1,23 +1,13 @@
 package df.aem.jmx2log.impl;
 
-import df.aem.jmx2log.ReadJmxService;
 import com.google.common.annotations.VisibleForTesting;
+import df.aem.jmx2log.ReadJmxService;
+import df.aem.jmx2log.exception.CouldNotReadJmxValueException;
+import df.aem.jmx2log.exception.NoSuchAttributeException;
+import df.aem.jmx2log.exception.NoSuchMBeanException;
 import org.osgi.service.component.annotations.Component;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.BadAttributeValueExpException;
-import javax.management.BadBinaryOpValueExpException;
-import javax.management.BadStringOperationException;
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.InvalidApplicationException;
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.management.QueryExp;
-import javax.management.ReflectionException;
-import javax.management.RuntimeMBeanException;
+import javax.management.*;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,31 +20,41 @@ import java.util.Set;
 public class ReadJmxServiceImpl implements ReadJmxService {
 
     @VisibleForTesting
-    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+    protected MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
+    @Override
     public Iterable<ObjectName> mBeans() {
-        return server.queryNames(null, null);
+        return this.mBeans(".*");
     }
 
-    public Iterable<ObjectName> mBeans(final String pattern) {
+    @Override
+    public Iterable<ObjectName> mBeans(final String pattern) throws NoSuchMBeanException {
         final Set<ObjectName> objectNames = server.queryNames(null, new QueryExp() {
             @Override
-            public boolean apply(ObjectName name) throws BadStringOperationException, BadBinaryOpValueExpException, BadAttributeValueExpException, InvalidApplicationException {
+            public boolean apply(ObjectName name)  {
                 return name.toString().matches(pattern);
             }
 
             @Override
             public void setMBeanServer(MBeanServer s) {
-
+                // We already know the server we run the query on - if ever interested in that information.
             }
         });
+
+        if(objectNames.isEmpty()) {
+            throw new NoSuchMBeanException(pattern);
+        }
         return objectNames;
     }
+
+    @Override
     public Iterable<MBeanAttribute> attributes(ObjectName mBean) throws CouldNotReadJmxValueException {
-        return attributes(mBean, null);
+        return attributes(mBean, ".*");
     }
 
-    public Iterable<MBeanAttribute> attributes(ObjectName mBean, String namePattern) throws CouldNotReadJmxValueException {
+    @Override
+    public Iterable<MBeanAttribute> attributes(ObjectName mBean, String namePattern)
+            throws CouldNotReadJmxValueException {
         try {
             final MBeanAttributeInfo[] attributes = server.getMBeanInfo(mBean).getAttributes();
             final List<MBeanAttribute> resultAttributes  = new ArrayList<>();
@@ -63,7 +63,7 @@ public class ReadJmxServiceImpl implements ReadJmxService {
                 final String name = attribute.getName();
                 final String type = attribute.getType();
                 final Object value = server.getAttribute(mBean, name);
-                if (namePattern == null || name.matches(namePattern))
+                if (name.matches(namePattern))
 
                 resultAttributes.add(new MBeanAttribute() {
                     @Override
@@ -82,6 +82,10 @@ public class ReadJmxServiceImpl implements ReadJmxService {
                     }
                 });
 
+            }
+
+            if(resultAttributes.isEmpty()) {
+                throw new NoSuchAttributeException(mBean, namePattern);
             }
             return resultAttributes;
         } catch (RuntimeMBeanException | InstanceNotFoundException | IntrospectionException | ReflectionException | MBeanException | AttributeNotFoundException e) {

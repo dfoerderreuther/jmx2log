@@ -2,6 +2,9 @@ package df.aem.jmx2log.impl;
 
 import com.google.common.annotations.VisibleForTesting;
 import df.aem.jmx2log.ReadJmxService;
+import df.aem.jmx2log.exception.CouldNotReadJmxValueException;
+import df.aem.jmx2log.exception.NoSuchAttributeException;
+import df.aem.jmx2log.exception.NoSuchMBeanException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.*;
 import org.apache.sling.commons.osgi.PropertiesUtil;
@@ -102,35 +105,42 @@ public class JmxToLogService implements Runnable {
 
     public void run() {
         for (SearchConfig searchConfig : searchConfigs) {
-            logJmxValues(searchConfig.getNamePattern(), searchConfig.getAttributePattern());
+            try {
+                logJmxValues(searchConfig);
+            } catch (NoSuchMBeanException nsmbe) {
+                CLASS_LOG.warn("\"{}\" currently does not denote an existing MBean.", searchConfig);
+            }
         }
     }
 
-    private void logJmxValues(String namePattern, String attributeNamePattern) {
-        for (ObjectName mBean : readJmxService.mBeans(namePattern)) {
+    private void logJmxValues(final SearchConfig searchConfig) {
+        for (ObjectName mBean : readJmxService.mBeans(searchConfig.getNamePattern())) {
             try {
-                for (ReadJmxService.MBeanAttribute mBeanAttribute : readJmxService.attributes(mBean, attributeNamePattern)) {
-                    log(mBeanAttribute, namePattern, attributeNamePattern);
+                for (ReadJmxService.MBeanAttribute mBeanAttribute : readJmxService.attributes(mBean, searchConfig.getAttributePattern())) {
+                    log(mBeanAttribute, searchConfig);
                 }
-            } catch (ReadJmxService.CouldNotReadJmxValueException e) {
-                jmxLog.error(String.format("cant read mBean values for %s", mBean.toString()), e);
+            } catch (NoSuchAttributeException nsae) {
+                CLASS_LOG.warn("Currently unable to read mbean attribute for {}.", nsae.getMessage());
+            } catch (CouldNotReadJmxValueException e) {
+                jmxLog.error("Failed to read values of \"{}\" for \"{}\".", mBean.toString(), e.getMessage());
+                CLASS_LOG.error("Failed to read MBean values", e);
             }
         }
     }
 
     @VisibleForTesting
     void log(final ReadJmxService.MBeanAttribute mBeanAttribute,
-             final String beanPattern, final String attributePattern) {
+             final SearchConfig searchConfig) {
         if(jmxLog !=null) {
             final String message = MessageFormat.format(messageTemplate,
                     mBeanAttribute.type(), mBeanAttribute.name(), mBeanAttribute.value(),
-                    beanPattern, attributePattern);
+                    searchConfig.getNamePattern(), searchConfig.getAttributePattern());
             jmxLog.info(message);
         }
     }
 
     @VisibleForTesting
-    static class SearchConfig {
+    protected static class SearchConfig {
 
         private final String namePattern;
 
@@ -147,6 +157,14 @@ public class JmxToLogService implements Runnable {
 
         String getAttributePattern() {
             return attributePattern;
+        }
+
+        @Override
+        public String toString() {
+            return "SearchConfig{" +
+                    "namePattern='" + namePattern + '\'' +
+                    ", attributePattern='" + attributePattern + '\'' +
+                    '}';
         }
     }
 }

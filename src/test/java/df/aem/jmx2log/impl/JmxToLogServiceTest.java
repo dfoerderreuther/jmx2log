@@ -1,7 +1,7 @@
 package df.aem.jmx2log.impl;
 
-import df.aem.jmx2log.ReadJmxService;
 import com.google.common.collect.Lists;
+import df.aem.jmx2log.ReadJmxService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -11,14 +11,11 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.management.ObjectName;
-
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by Dominik Foerderreuther <df@adobe.com> on 29.12.17.
@@ -36,7 +33,7 @@ public class JmxToLogServiceTest {
     TestableJmxToLogService underTest = new TestableJmxToLogService();
 
     @Test
-    public void activate_initSearchConfigs() throws Exception {
+    public void activate_initSearchConfigs() {
         // given
         when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"a|b", "c|d"});
 
@@ -52,7 +49,7 @@ public class JmxToLogServiceTest {
     }
 
     @Test
-    public void activate_ignoreEmptyConfigs() throws Exception {
+    public void activate_ignoreEmptyConfigs() {
         // given
         when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{
                 "",
@@ -68,7 +65,7 @@ public class JmxToLogServiceTest {
     }
 
     @Test
-    public void activate_resetSearchConfigs() throws Exception {
+    public void activate_resetSearchConfigs() {
         // given
         when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"a|b"});
         underTest.activate(props);
@@ -84,7 +81,7 @@ public class JmxToLogServiceTest {
     }
 
     @Test
-    public void run_shouldSearchForBeansAndAttributes() throws Exception {
+    public void run_shouldSearchForBeansAndAttributes() {
         // given
         when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"beanA|attributeA", "beanB|attributeB"});
         underTest.activate(props);
@@ -106,7 +103,7 @@ public class JmxToLogServiceTest {
         verify(readJmxService).attributes(mBean, "attributeB");
     }
     @Test
-    public void run_shouldLogResult() throws Exception {
+    public void run_shouldLogResult() {
         // given
         when(props.get(JmxToLogService.SEARCH_CONFIG)).thenReturn(new String[]{"beanA|attributeA"});
         underTest.activate(props);
@@ -141,10 +138,10 @@ public class JmxToLogServiceTest {
 
         @Override
         void log(ReadJmxService.MBeanAttribute mBeanAttribute,
-                 String beanPattern, String attributePattern) {
+                 SearchConfig searchConfig) {
             this.lastLogParam = mBeanAttribute;
-            this.beanPattern = beanPattern;
-            this.attributePattern = attributePattern;
+            this.beanPattern = searchConfig.getNamePattern();
+            this.attributePattern = searchConfig.getAttributePattern();
         }
     }
 

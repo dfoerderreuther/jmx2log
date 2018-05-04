@@ -1,6 +1,7 @@
 package df.aem.jmx2log.impl;
 
 import df.aem.jmx2log.ReadJmxService;
+import df.aem.jmx2log.exception.CouldNotReadJmxValueException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.ObjectName;
 import javax.servlet.Servlet;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
@@ -27,7 +27,7 @@ public class Jmx2logConfigServlet extends HttpServlet {
     ReadJmxService readJmxService;
 
     @Override
-    public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
+    public void service(ServletRequest req, ServletResponse res) throws IOException {
         complete(res.getWriter());
     }
 
@@ -57,7 +57,7 @@ public class Jmx2logConfigServlet extends HttpServlet {
 
                 }
 
-            } catch (ReadJmxService.CouldNotReadJmxValueException e) {
+            } catch (CouldNotReadJmxValueException e) {
                 log.error("cant read attributes of " + mbean.toString(), e);
             }
 
