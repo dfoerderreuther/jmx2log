@@ -10,9 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.ObjectName;
 import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Dominik Foerderreuther <df@adobe.com> on 25.12.17.
@@ -27,6 +28,8 @@ import java.util.Map;
 })
 public class JmxToLogService implements Runnable {
 
+    private static final Logger CLASS_LOG = LoggerFactory.getLogger(JmxToLogService.class);
+
     private static final String LOGGER_NAME_PROP = "logger.name";
     private static final String LOGGER_NAME_DEFAULT = "jmx2log";
 
@@ -35,7 +38,7 @@ public class JmxToLogService implements Runnable {
 
     @Property(label = "Logger", name=LOGGER_NAME_PROP, value=LOGGER_NAME_DEFAULT,
               description = "Name of the logger to log to.")
-    private Logger log = null;
+    private Logger jmxLog = null;
 
     @Property(label = "Message Template", name=MESSAGE_TEMPLATE_PROP, value = MESSAGE_TEMPLATE_DEFAULT,
               description = "{0}: Type {1}: Name of property, {2}: Value of property, {3}: Bean pattern, {4}: Property pattern")
@@ -55,25 +58,46 @@ public class JmxToLogService implements Runnable {
 
     @Activate
     protected void activate(final Map<String, Object> props) {
-        searchConfigs = new ArrayList<>();
-        String[] strSearchConfigs = PropertiesUtil.toStringArray(props.get(SEARCH_CONFIG), new String[]{DEFAULT_SEARCH_CONFIG});
-        for (String strSearchConfig : strSearchConfigs) {
-            if (StringUtils.isBlank(strSearchConfig)) {
-                continue;
-            }
-            String[] parts = strSearchConfig.split("\\|");
-            String namePattern = parts[0];
-            String attributePattern = parts.length > 1 ? parts[1] : ".*";
-            searchConfigs.add(new SearchConfig(namePattern, attributePattern));
-        }
+        searchConfigs = new CopyOnWriteArrayList<>(
+            parseSearchConfigs(PropertiesUtil.toStringArray(props.get(SEARCH_CONFIG), new String[]{DEFAULT_SEARCH_CONFIG})));
 
         messageTemplate = PropertiesUtil.toString(props.get(MESSAGE_TEMPLATE_PROP), MESSAGE_TEMPLATE_DEFAULT);
-        log = LoggerFactory.getLogger(PropertiesUtil.toString(props.get(LOGGER_NAME_PROP), LOGGER_NAME_DEFAULT));
+        jmxLog = LoggerFactory.getLogger(PropertiesUtil.toString(props.get(LOGGER_NAME_PROP), LOGGER_NAME_DEFAULT));
+    }
+
+    private List<SearchConfig> parseSearchConfigs(String[] patternLines) {
+        final List<SearchConfig> configs = new LinkedList<>();
+        for (String patternLine : patternLines) {
+            if (StringUtils.isBlank(patternLine)) {
+                CLASS_LOG.warn("Ignoring empty line in search configs.");
+                continue;
+            }
+
+            final int split = StringUtils.indexOf(patternLine, '|');
+            final String beanPattern;
+            final String attrPattern;
+            if(split<0) {
+                beanPattern = patternLine;
+                attrPattern = ".*";
+                CLASS_LOG.info("Assuming attribute pattern \".*\" to output all attributes since configuration line \"{}\" does not contain separator '|'.", patternLine);
+            } else {
+                beanPattern = StringUtils.substring(patternLine, 0, split);
+                attrPattern = StringUtils.substring(patternLine, split+1);
+            }
+
+            CLASS_LOG.info("Adding bean \"{}\", attribute \"{}\" to search configuration", beanPattern, attrPattern);
+            configs.add(
+                    new SearchConfig(
+                            StringUtils.trim(beanPattern),
+                            StringUtils.trim(attrPattern)));
+        }
+
+        return configs;
     }
 
     @Deactivate
     private void deactivate() {
-        this.log = null;
+        this.jmxLog = null;
     }
 
     public void run() {
@@ -89,7 +113,7 @@ public class JmxToLogService implements Runnable {
                     log(mBeanAttribute, namePattern, attributeNamePattern);
                 }
             } catch (ReadJmxService.CouldNotReadJmxValueException e) {
-                log.error(String.format("cant read mBean values for %s", mBean.toString()), e);
+                jmxLog.error(String.format("cant read mBean values for %s", mBean.toString()), e);
             }
         }
     }
@@ -97,11 +121,11 @@ public class JmxToLogService implements Runnable {
     @VisibleForTesting
     void log(final ReadJmxService.MBeanAttribute mBeanAttribute,
              final String beanPattern, final String attributePattern) {
-        if(log!=null) {
+        if(jmxLog !=null) {
             final String message = MessageFormat.format(messageTemplate,
                     mBeanAttribute.type(), mBeanAttribute.name(), mBeanAttribute.value(),
                     beanPattern, attributePattern);
-            log.info(message);
+            jmxLog.info(message);
         }
     }
 
