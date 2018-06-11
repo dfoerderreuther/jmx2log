@@ -1,5 +1,9 @@
 package df.aem.jmx2log;
 
+import df.aem.jmx2log.exception.CouldNotReadJmxValueException;
+import df.aem.jmx2log.exception.NoSuchAttributeException;
+import df.aem.jmx2log.exception.NoSuchMBeanException;
+
 import javax.management.ObjectName;
 
 /**
@@ -7,13 +11,45 @@ import javax.management.ObjectName;
  */
 public interface ReadJmxService {
 
-    Iterable<ObjectName> mBeans();
+    /**
+     * List all mBeans on local mBean server.
+     *
+     * @return all MBeans on local MBean server
+     * @throws NoSuchMBeanException if no MBean exists.
+     */
+    Iterable<ObjectName> mBeans() throws NoSuchMBeanException;
 
-    Iterable<ObjectName> mBeans(String pattern);
+    /**
+     * Looks up all mBeans on local mBean server that match <code>pattern</code>.
+     *
+     * <p>If no such mBean exists, a <code>NoSuchMBeanException</code> will be thrown.</p>
+     * @param pattern The pattern to match names of mbeans against
+     * @return Set of matching {@link ObjectName}s
+     * @throws NoSuchMBeanException if no matching MBean exists.
+     */
+    Iterable<ObjectName> mBeans(String pattern) throws NoSuchMBeanException;
 
+    /**
+     * Evaluates all attributes of <code>mbean</code>.
+     *
+     * @param mBean The mbean to evaluate
+     * @return an iterable over all the values that have been extracted during run
+     * @throws CouldNotReadJmxValueException if something goes wrong while reading any value
+     * @throws NoSuchAttributeException if <code>mbean</code> does not contain any attribute
+     */
     Iterable<MBeanAttribute> attributes(ObjectName mBean) throws CouldNotReadJmxValueException;
 
-    Iterable<MBeanAttribute> attributes(ObjectName mBean, String namePattern) throws CouldNotReadJmxValueException;
+    /**
+     * Evaluates all attributes on <code>mbean</code> that match <code>namePattern</code>.
+     *
+     * @param mBean The MBean to evaluate
+     * @param namePattern The pattern attributes of <code>mbean</code> will be matched against
+     * @return an iterable over all the values that have been extracted during run
+     * @throws CouldNotReadJmxValueException if something goes wrong while reading any value
+     * @throws NoSuchAttributeException if something is wrong with the configuration -> no matching attribute on <code>mbean</code>
+     */
+    Iterable<MBeanAttribute> attributes(ObjectName mBean, String namePattern)
+            throws CouldNotReadJmxValueException, NoSuchAttributeException;
 
     interface MBeanAttribute {
         String name();
@@ -23,11 +59,4 @@ public interface ReadJmxService {
         Object value();
     }
 
-    class CouldNotReadJmxValueException extends Exception {
-
-        public CouldNotReadJmxValueException(Throwable e) {
-            super(e);
-        }
-
-    }
 }
