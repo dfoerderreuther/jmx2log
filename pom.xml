@@ -23,7 +23,7 @@
     <!-- ====================================================================== -->
     <properties>
         <crx.host>localhost</crx.host>
-        <crx.port>14502</crx.port>
+        <crx.port>4502</crx.port>
         <crx.username>admin</crx.username>
         <crx.password>admin</crx.password>
         <encoding>UTF-8</encoding>
