@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
- * Created by Dominik Foerderreuther <df@adobe.com> on 29.12.17.
+ * Created by Dominik Foerderreuther df@adobe.com on 29.12.17.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class JmxToLogServiceTest {

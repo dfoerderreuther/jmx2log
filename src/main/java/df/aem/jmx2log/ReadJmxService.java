@@ -7,7 +7,7 @@ import df.aem.jmx2log.exception.NoSuchMBeanException;
 import javax.management.ObjectName;
 
 /**
- * Created by Dominik Foerderreuther <df@adobe.com> on 26.12.17.
+ * Created by Dominik Foerderreuther df@adobe.com on 26.12.17.
  */
 public interface ReadJmxService {
 

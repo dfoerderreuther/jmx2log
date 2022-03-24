@@ -1,7 +1,7 @@
 package df.aem.jmx2log;
 
 /**
- * Created by Dominik Foerderreuther <df@adobe.com> on 27.12.17.
+ * Created by Dominik Foerderreuther df@adobe.com on 27.12.17.
  */
 public @interface JmxToLogConfig {
 

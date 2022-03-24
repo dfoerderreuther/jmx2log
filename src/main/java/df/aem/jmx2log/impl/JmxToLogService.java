@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Created by Dominik Foerderreuther <df@adobe.com> on 25.12.17.
+ * Created by Dominik Foerderreuther df@adobe.com on 25.12.17.
  */
 @Service(Runnable.class)
 @Component(metatype=true,

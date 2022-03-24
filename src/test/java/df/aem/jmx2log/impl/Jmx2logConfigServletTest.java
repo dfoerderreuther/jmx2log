@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by Dominik Foerderreuther <df@adobe.com> on 30.12.17.
+ * Created by Dominik Foerderreuther df@adobe.com on 30.12.17.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class Jmx2logConfigServletTest {

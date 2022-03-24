@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * Created by Dominik Foerderreuther <df@adobe.com> on 25.12.17.
+ * Created by Dominik Foerderreuther df@adobe.com on 25.12.17.
  */
 @Component(service = Servlet.class, property = {"felix.webconsole.label=JMX-Dump", "felix.webconsole.title=JMX mBean dump"})
 public class Jmx2logConfigServlet extends HttpServlet {

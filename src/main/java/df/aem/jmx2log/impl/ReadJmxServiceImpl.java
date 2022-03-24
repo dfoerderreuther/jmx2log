@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by Dominik Foerderreuther <df@adobe.com> on 26.12.17.
+ * Created by Dominik Foerderreuther df@adobe.com on 26.12.17.
  */
 @Component(service = ReadJmxService.class)
 public class ReadJmxServiceImpl implements ReadJmxService {
