@@ -20,9 +20,9 @@ public interface ReadJmxService {
     Iterable<ObjectName> mBeans() throws NoSuchMBeanException;
 
     /**
-     * Looks up all mBeans on local mBean server that match <code>pattern</code>.
+     * Looks up all mBeans on local mBean server that match pattern.
      *
-     * <p>If no such mBean exists, a <code>NoSuchMBeanException</code> will be thrown.</p>
+     * If no such mBean exists, a NoSuchMBeanException will be thrown.
      * @param pattern The pattern to match names of mbeans against
      * @return Set of matching {@link ObjectName}s
      * @throws NoSuchMBeanException if no matching MBean exists.
@@ -30,23 +30,23 @@ public interface ReadJmxService {
     Iterable<ObjectName> mBeans(String pattern) throws NoSuchMBeanException;
 
     /**
-     * Evaluates all attributes of <code>mbean</code>.
+     * Evaluates all attributes of mbean.
      *
      * @param mBean The mbean to evaluate
      * @return an iterable over all the values that have been extracted during run
      * @throws CouldNotReadJmxValueException if something goes wrong while reading any value
-     * @throws NoSuchAttributeException if <code>mbean</code> does not contain any attribute
+     * @throws NoSuchAttributeException if mbean does not contain any attribute
      */
     Iterable<MBeanAttribute> attributes(ObjectName mBean) throws CouldNotReadJmxValueException;
 
     /**
-     * Evaluates all attributes on <code>mbean</code> that match <code>namePattern</code>.
+     * Evaluates all attributes on mbean that match namePattern.
      *
      * @param mBean The MBean to evaluate
-     * @param namePattern The pattern attributes of <code>mbean</code> will be matched against
+     * @param namePattern The pattern attributes of mbean will be matched against
      * @return an iterable over all the values that have been extracted during run
      * @throws CouldNotReadJmxValueException if something goes wrong while reading any value
-     * @throws NoSuchAttributeException if something is wrong with the configuration -> no matching attribute on <code>mbean</code>
+     * @throws NoSuchAttributeException if something is wrong with the configuration -> no matching attribute on mbean
      */
     Iterable<MBeanAttribute> attributes(ObjectName mBean, String namePattern)
             throws CouldNotReadJmxValueException, NoSuchAttributeException;
