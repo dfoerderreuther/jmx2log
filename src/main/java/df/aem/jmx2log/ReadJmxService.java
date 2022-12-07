@@ -50,7 +50,7 @@ public interface ReadJmxService {
      * @throws CouldNotReadJmxValueException if something goes wrong while reading
      *                                       any value
      * @throws NoSuchAttributeException      if something is wrong with the
-     *                                       configuration -> no matching attribute
+     *                                       configuration - no matching attribute
      *                                       on mbean
      */
     Iterable<MBeanAttribute> attributes(ObjectName mBean, String namePattern)
