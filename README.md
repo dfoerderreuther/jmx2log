@@ -43,7 +43,7 @@ The name of the logger to log bean attributes to. All logging to this logger wil
 
 **Property: Message Template**
 
-This template will be used to create log messages. Defaults to '{1}: {2}'.
+This template will be used to create log messages. Defaults to '{5}:{1}: {2}'.
 
 Arbitrary text can be specified as defined by [java.text.MessageFormat](https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html).
 Following placeholders can be used:
@@ -52,6 +52,7 @@ Following placeholders can be used:
 - **{2}**: Value of property
 - **{3}**: Bean pattern
 - **{4}**: Property pattern (messageTemplate)
+- **{5}**: mBean path and name
 
 **Property: Search**
 
